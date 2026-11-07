@@ -1,0 +1,47 @@
+@model IEnumerable<QLSanBongMini.Models.SanModel>
+
+@{
+    ViewData["Title"] = "Quản lý sân";
+}
+
+<h2>Quản lý danh sách sân bóng</h2>
+
+<form asp-action="Index" method="get" class="row g-3 mb-3">
+    <div class="col-auto">
+        <input type="text" name="keyword" class="form-control" value="@ViewData["Keyword"]" placeholder="Tìm theo mã hoặc tên sân..." />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">Tìm kiếm</button>
+        @if (User.IsInRole("Quản lý")) { <a asp-action="Create" class="btn btn-success">Thêm sân mới</a> }
+    </div>
+</form>
+
+<table class="table table-bordered table-striped">
+    <thead>
+        <tr>
+            <th>Mã sân</th>
+            <th>Tên sân</th>
+            <th>Loại sân</th>
+            <th>Giá thuê/giờ</th>
+            <th>Trạng thái hoạt động</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.MaSan</td>
+                <td>@item.TenSan</td>
+                <td>@item.LoaiSan</td>
+                <td>@item.GiaThueGio.ToString("N0") đ</td>
+                <td>
+                    @(item.TrangThaiHoatDong ? "Đang hoạt động" : "Ngừng hoạt động")
+                </td>
+                <td>
+                    @if (User.IsInRole("Quản lý")) { <a asp-action="Edit" asp-route-id="@item.MaSan" class="btn btn-warning btn-sm">Sửa</a> }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

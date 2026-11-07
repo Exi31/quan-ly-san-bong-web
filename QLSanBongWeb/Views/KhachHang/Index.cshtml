@@ -1,0 +1,145 @@
+@model IEnumerable<QuanLySanBong.Models.KhachHang>
+
+@{
+    ViewData["Title"] = "Khách hàng";
+}
+
+<div class="card p-4 shadow-sm bg-white" style="border: 1.5px solid #114b27; border-radius: 4px;">
+    <h4 class="fw-bold mb-3" style="color: #114b27;"><i class="fa-solid fa-users"></i> Quản lý khách hàng</h4>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger py-2">@TempData["Error"]</div>
+    }
+    <form method="get" asp-action="Index">
+        <div class="row g-2 mb-3 bg-light p-3 rounded border">
+            <div class="col-md-10">
+                <input type="text" name="searchString" class="form-control" value="@ViewBag.SearchString" placeholder="Tìm theo tên hoặc số điện thoại...">
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn text-white w-100 fw-bold" style="background-color: #114b27;">Tìm kiếm</button>
+            </div>
+        </div>
+    </form>
+    <div class="table-responsive mb-3" style="max-height: 250px; overflow-y: auto;">
+        <table class="table table-bordered table-hover align-middle" style="cursor: pointer;">
+            <thead class="table-light sticky-top">
+                <tr>
+                    <th>Mã khách</th>
+                    <th>Họ tên</th>
+                    <th>Số điện thoại</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr class="chon-khach" data-ma="@item.MaKH" data-ten="@item.TenKH" data-sdt="@item.SoDT">
+                        <td>@item.MaKH</td>
+                        <td>@item.TenKH</td>
+                        <td>@item.SoDT</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <form asp-action="Save" method="post" id="formKhachHang">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="actionType" id="actionType" value="Add" />
+
+        <div class="border p-3 rounded bg-light">
+            <h6 class="fw-bold text-secondary mb-3">Thông tin khách hàng</h6>
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small">Mã khách:</label>
+                    <input type="text" id="MaKH" name="MaKH" class="form-control bg-white" value="@ViewBag.NextMaKH" readonly />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small">Họ tên:</label>
+                    <input type="text" id="TenKH" name="TenKH" maxlength="50" class="form-control bg-white" placeholder="Nhập họ tên" readonly required />
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold small">Số điện thoại:</label>
+                    <input type="text" id="SoDT" name="SoDT" maxlength="21" class="form-control bg-white" placeholder="Nhập số điện thoại" readonly required />
+                </div>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn text-white px-4 fw-bold" style="background-color: #114b27;" onclick="cheDoThem()">Thêm</button>
+                <button type="button" class="btn btn-secondary px-4 fw-bold" onclick="cheDoSua()">Sửa</button>
+                <button type="submit" class="btn text-white px-4 fw-bold" style="background-color: #198754;" id="btnLuu" disabled>Lưu</button>
+                <button type="button" class="btn btn-outline-danger px-4 fw-bold" onclick="huyBo()">Hủy</button>
+                <button type="button" class="btn btn-light border px-4 fw-bold text-secondary" onclick="lamMoi()">Làm mới</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+@if (ViewBag.KhachNhap is QuanLySanBong.Models.KhachHang nhap) {
+    <div id="duLieuNhapLai" hidden data-ma="@nhap.MaKH" data-ten="@nhap.TenKH" data-sdt="@nhap.SoDT" data-mode="@ViewBag.CheDo"></div>
+}
+
+@section Scripts {
+    <script>
+        let khachDangChon = null;
+        document.querySelectorAll('.chon-khach').forEach(row => row.addEventListener('click', () => chonKhachHang(row.dataset.ma,row.dataset.ten,row.dataset.sdt)));
+
+        function chonKhachHang(ma, ten, sdt) {
+            khachDangChon = { ma, ten, sdt };
+            document.getElementById("MaKH").value = ma;
+            document.getElementById("TenKH").value = ten;
+            document.getElementById("SoDT").value = sdt;
+            document.getElementById("TenKH").readOnly = true;
+            document.getElementById("SoDT").readOnly = true;
+            document.getElementById("btnLuu").disabled = true;
+            document.getElementById("actionType").value = "Edit";
+        }
+        function cheDoThem() {
+            document.getElementById("actionType").value = "Add";
+            document.getElementById("MaKH").value = "@ViewBag.NextMaKH";
+            document.getElementById("TenKH").value = "";
+            document.getElementById("SoDT").value = "";
+            document.getElementById("TenKH").readOnly = false;
+            document.getElementById("SoDT").readOnly = false;
+            document.getElementById("btnLuu").disabled = false; 
+            document.getElementById("TenKH").focus();
+        }
+        function cheDoSua() {
+            let ma = document.getElementById("MaKH").value;
+            if (!ma || document.getElementById("actionType").value !== "Edit") {
+                alert("Vui lòng chọn khách hàng cần sửa trên bảng trước!");
+                return;
+            }
+            document.getElementById("actionType").value = "Edit";
+            document.getElementById("TenKH").readOnly = false;
+            document.getElementById("SoDT").readOnly = false;
+            document.getElementById("btnLuu").disabled = false; 
+            document.getElementById("TenKH").focus();
+        }
+        function huyBo() {
+            document.getElementById("MaKH").value = khachDangChon?.ma ?? "@ViewBag.NextMaKH";
+            document.getElementById("TenKH").value = khachDangChon?.ten ?? "";
+            document.getElementById("SoDT").value = khachDangChon?.sdt ?? "";
+            document.getElementById("actionType").value = khachDangChon ? "Edit" : "Add";
+            document.getElementById("TenKH").readOnly = true;
+            document.getElementById("SoDT").readOnly = true;
+            document.getElementById("btnLuu").disabled = true;
+        }
+
+        const saved=document.getElementById('duLieuNhapLai');
+        if(saved) {
+            const originalRow = Array.from(document.querySelectorAll('.chon-khach')).find(row => row.dataset.ma === saved.dataset.ma);
+            if (saved.dataset.mode === 'Edit' && originalRow) khachDangChon = { ma: originalRow.dataset.ma, ten: originalRow.dataset.ten, sdt: originalRow.dataset.sdt };
+            document.getElementById('MaKH').value=saved.dataset.ma;
+            document.getElementById('TenKH').value=saved.dataset.ten;
+            document.getElementById('SoDT').value=saved.dataset.sdt;
+            document.getElementById('actionType').value=saved.dataset.mode;
+            document.getElementById('TenKH').readOnly=false;
+            document.getElementById('SoDT').readOnly=false;
+            document.getElementById('btnLuu').disabled=false;
+        }
+        function lamMoi() {
+            location.reload();
+        }
+    </script>
+}

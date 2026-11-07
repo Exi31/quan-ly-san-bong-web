@@ -1,0 +1,8 @@
+@model ErrorViewModel
+@{ ViewData["Title"] = "Không hoàn tất thao tác"; }
+<div class="alert alert-warning">
+    <h2>Chưa hoàn tất thao tác</h2>
+    <p>Vui lòng thử lại hoặc trở về trang chủ. Nếu lỗi lặp lại, hãy báo cho người quản lý.</p>
+    @if (Model.ShowRequestId) { <p class="small">Mã tra cứu lỗi: @Model.RequestId</p> }
+</div>
+<a asp-controller="Home" asp-action="Index" class="btn btn-success">Về trang chủ</a>

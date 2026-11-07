@@ -1,0 +1,302 @@
+@{ ViewData["Title"] = "Hóa đơn"; }
+<h2>Hóa đơn sân bóng</h2>
+@model QLSanBongWeb.Models.HoaDonViewModel
+@if (TempData["ThongBao"] != null)
+{
+    <div class="alert alert-info">
+        @TempData["ThongBao"]
+    </div>
+}
+<form id="tokenHoaDon" method="post">@Html.AntiForgeryToken()</form>
+<!-- CHỌN LỊCH ĐẶT SÂN -->
+<div class="booking-select">
+    <label for="maDat">Lịch đặt sân</label>
+
+    <select id="maDat" name="maDat">
+        <option value="">-- Chọn lịch đặt sân --</option>
+
+        @foreach (var item in Model.DanhSachLichDatSan)
+        {
+            <option value="@item.MaDatSan">
+                @item.MaDatSan - @item.TenKhachHang - @item.TenSan
+            </option>
+        }
+    </select>
+</div>
+
+<!-- THÔNG TIN HÓA ĐƠN -->
+<div class="invoice-information">
+
+    <div class="information-column">
+
+        <div class="info-row">
+            <span>Khách hàng:</span>
+            <strong id="tenKhachHang">@(Model.TenKhachHang ?? "—")</strong>
+        </div>
+
+        <div class="info-row">
+            <span>Sân bóng:</span>
+            <strong id="tenSan">@(Model.TenSan ?? "—")</strong>
+        </div>
+
+        <div class="info-row">
+            <span>Bắt đầu:</span>
+            <strong id="gioBatDau">
+                @(Model.GioBatDau?.ToString("dd/MM/yyyy HH:mm") ?? "—")
+            </strong>
+        </div>
+
+        <div class="info-row">
+            <span>Kết thúc:</span>
+            <strong id="gioKetThuc">
+                @(Model.GioKetThuc?.ToString("dd/MM/yyyy HH:mm") ?? "—")
+            </strong>
+        </div>
+
+    </div>
+
+    <div class="information-column payment-information">
+
+        <div class="info-row">
+            <span>Thời lượng:</span>
+            <strong id="thoiLuong">—</strong>
+        </div>
+
+        <div class="info-row">
+            <span>Đơn giá:</span>
+            <strong>
+                <span id="donGia">
+                    @(Model.DonGia?.ToString("N0") ?? "0")
+                </span> đ/giờ
+            </strong>
+        </div>
+
+        <div class="total-label">Tổng tiền</div>
+
+        <div class="total-amount">
+            <span id="tongTien">
+                @((Model.TongTien ?? 0).ToString("N0"))
+            </span> đ
+        </div>
+
+    </div>
+
+</div>
+
+<div class="invoice-actions">
+    <button type="button" id="btnLapHoaDon" class="btn-primary">
+        Lập hóa đơn
+    </button>
+
+    <button type="button" id="btnLamMoi" class="btn-secondary">
+        Làm mới
+    </button>
+</div>
+
+<!-- DANH SÁCH HÓA ĐƠN -->
+<div class="table-card">
+
+    <h3 class="section-title">Danh sách hóa đơn</h3>
+
+    <table class="invoice-table">
+        <thead>
+            <tr>
+                <th>Mã HĐ</th>
+                <th>Mã đặt</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+
+        <tbody>
+            @if (Model.DanhSachHoaDon != null && Model.DanhSachHoaDon.Count > 0)
+            {
+                @foreach (var hd in Model.DanhSachHoaDon)
+                {
+                    <tr>
+                        <td>@(hd.MaHD ?? "—")</td>
+                        <td>@(hd.MaDat ?? "—")</td>
+                        <td class="money-cell">
+                            @((hd.TongTien ?? 0).ToString("N0")) đ
+                        </td>
+                        <td>
+                            @if (hd.TrangThai == "Đã thanh toán")
+                            {
+                                <span class="status-badge paid">
+                                    Đã thanh toán
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="status-badge pending">
+                                    @(hd.TrangThai ?? "—")
+                                </span>
+                            }
+                        </td>
+                        <td>
+                            @if (hd.TrangThai == "Chưa thanh toán" && hd.TrangThaiLich != "Đã hủy")
+                            {
+                                <a href="@Url.Action("Index", "ThanhToan",
+                                    new { maHD = hd.MaHD })"
+                                   class="btn-success">
+                                    Thanh toán
+                                </a>
+                            }
+                            else
+                            {
+                                <span>@(hd.TrangThaiLich == "Đã hủy" ? "Lịch đã hủy" : "Đã thanh toán")</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="empty-data">
+                        Chưa có dữ liệu hóa đơn
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</div>
+<script>
+    const selectLichDat = document.getElementById("maDat");
+
+    selectLichDat.addEventListener("change", async function () {
+
+        const maDatSan = this.value;
+
+        // Nếu chưa chọn lịch đặt sân
+        if (!maDatSan) {
+            document.getElementById("tenKhachHang").textContent = "—";
+            document.getElementById("tenSan").textContent = "—";
+            document.getElementById("gioBatDau").textContent = "—";
+            document.getElementById("gioKetThuc").textContent = "—";
+            document.getElementById("thoiLuong").textContent = "—";
+            document.getElementById("donGia").textContent = "0";
+            document.getElementById("tongTien").textContent = "0";
+            return;
+        }
+
+        try {
+            const url = '@Url.Action("LayThongTinDatSan", "HoaDon")';
+
+            const response = await fetch(
+                url + "?maDatSan=" + encodeURIComponent(maDatSan)
+            );
+
+            if (!response.ok) {
+                throw new Error("Không lấy được thông tin lịch đặt sân.");
+            }
+
+            const data = await response.json();
+
+            // Định dạng tiền Việt Nam
+            const dinhDangTien = new Intl.NumberFormat("vi-VN");
+
+            // Cập nhật thông tin khách hàng và sân
+            document.getElementById("tenKhachHang").textContent =
+                data.tenKhachHang;
+
+            document.getElementById("tenSan").textContent =
+                data.tenSan;
+
+            document.getElementById("gioBatDau").textContent =
+                data.gioBatDau;
+
+            document.getElementById("gioKetThuc").textContent =
+                data.gioKetThuc;
+
+            // Cập nhật thời lượng
+            document.getElementById("thoiLuong").textContent =
+                Number(data.thoiLuong).toLocaleString("vi-VN") + " giờ";
+
+            // Cập nhật đơn giá
+            document.getElementById("donGia").textContent =
+                dinhDangTien.format(data.donGia);
+
+            // Cập nhật tổng tiền
+            document.getElementById("tongTien").textContent =
+                dinhDangTien.format(data.tongTien);
+
+        }
+        catch (error) {
+            alert(error.message);
+        }
+    });
+</script>
+<script>
+    // Xử lý nút lập hóa đơn
+    document.getElementById("btnLapHoaDon")
+        .addEventListener("click", async function () {
+
+            const maDatSan = document.getElementById("maDat").value;
+
+            if (!maDatSan) {
+                alert("Vui lòng chọn lịch đặt sân!");
+                return;
+            }
+
+            if (!confirm("Bạn có chắc chắn muốn lập hóa đơn cho lịch đặt sân này?")) {
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    '@Url.Action("LapHoaDon", "HoaDon")',
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded",
+                            "Accept": "application/json"
+                        },
+                        body: new URLSearchParams({
+                            maDatSan: maDatSan,
+                            __RequestVerificationToken: document.querySelector('#tokenHoaDon input[name="__RequestVerificationToken"]').value
+                        })
+                    }
+                );
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    alert(data.message || "Lập hóa đơn thất bại!");
+                    return;
+                }
+
+                alert(data.message + "\nMã hóa đơn: " + data.maHD);
+
+                // Tải lại trang để cập nhật danh sách
+                location.reload();
+            }
+            catch (error) {
+                console.error(error);
+                alert("Có lỗi xảy ra khi lập hóa đơn!");
+            }
+        });
+</script>
+<script>
+    document.getElementById("btnLamMoi").addEventListener("click", function () {
+        location.reload();
+        return;
+        // Đặt lại danh sách lịch đặt sân
+        document.getElementById("maDat").selectedIndex = 0;
+
+        // Xóa thông tin khách hàng và sân
+        document.getElementById("tenKhachHang").textContent = "—";
+        document.getElementById("tenSan").textContent = "—";
+
+        // Xóa thời gian đặt sân
+        document.getElementById("gioBatDau").textContent = "—";
+        document.getElementById("gioKetThuc").textContent = "—";
+
+        // Xóa thời lượng, đơn giá và tổng tiền
+        document.getElementById("thoiLuong").textContent = "—";
+        document.getElementById("donGia").textContent = "—";
+        document.getElementById("tongTien").textContent = "—";
+    });
+</script>

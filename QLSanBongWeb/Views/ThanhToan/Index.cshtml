@@ -1,0 +1,203 @@
+﻿@model QLSanBongWeb.Models.tblHoaDon
+
+@{
+    ViewData["Title"] = "Thanh toán hóa đơn";
+}
+
+<div class="payment-container">
+
+    <h2>THANH TOÁN HÓA ĐƠN</h2>
+
+    <div class="payment-information">
+
+        <div class="payment-row">
+            <span>Mã hóa đơn:</span>
+            <strong>@Model.MaHD</strong>
+        </div>
+
+        <div class="payment-row">
+            <span>Mã lịch đặt sân:</span>
+            <strong>@Model.MaDatSan</strong>
+        </div>
+
+        <div class="payment-row">
+            <span>Ngày lập:</span>
+            <strong>@Model.NgayLap.ToString("dd/MM/yyyy HH:mm")</strong>
+        </div>
+
+        <div class="payment-total">
+            <span>Tổng tiền thanh toán:</span>
+            <strong>@Model.TongTien.ToString("N0") đ</strong>
+        </div>
+
+    </div>
+
+    <h3>Chọn phương thức thanh toán</h3>
+
+    <div class="payment-methods">
+
+        <label class="payment-option">
+            <input type="radio"
+                   name="phuongThuc"
+                   value="TienMat"
+                   checked />
+
+            <span>💵 Thanh toán tiền mặt</span>
+        </label>
+
+        <label class="payment-option">
+            <input type="radio"
+                   name="phuongThuc"
+                   value="ChuyenKhoan" />
+
+            <span>📱 Chuyển khoản qua mã QR</span>
+        </label>
+
+    </div>
+
+    <div id="qrContainer" style="display:none;">
+        <h3>Quét mã QR để thanh toán</h3>
+
+        <div class="qr-box">
+            <div id="qrContent" class="qr-code"></div>
+
+            <p class="qr-note">MÃ QR MINH HỌA</p>
+        </div>
+
+        <div class="qr-information">
+            <p>Ngân hàng: <strong>NGÂN HÀNG MINH HỌA</strong></p>
+
+            <p>Số tài khoản: <strong>0000000000</strong></p>
+
+            <p>
+                Số tiền:
+                <strong>@Model.TongTien.ToString("N0") đ</strong>
+            </p>
+
+            <p>
+                Nội dung chuyển khoản:
+                <strong>@Model.MaHD</strong>
+            </p>
+        </div>
+    </div>
+
+    <div class="payment-actions">
+        <form asp-controller="ThanhToan"
+              asp-action="XacNhanThanhToan"
+              method="post"
+              id="formThanhToan">
+
+            @Html.AntiForgeryToken()
+
+            <input type="hidden" name="maHD" value="@Model.MaHD" />
+
+            <input type="hidden"
+                   name="phuongThuc"
+                   id="phuongThucHidden"
+                   value="TienMat" />
+
+            <button type="submit" id="btnXacNhanThanhToan">
+                Xác nhận thanh toán
+            </button>
+        </form>
+
+        <a href="@Url.Action("Index", "HoaDon")">Quay lại</a>
+    </div>
+
+</div>
+<script>
+    const cacPhuongThuc =
+        document.querySelectorAll('input[name="phuongThuc"]');
+
+    const qrContainer =
+        document.getElementById("qrContainer");
+
+    const qrContent =
+        document.getElementById("qrContent");
+
+    // Tạo QR minh họa
+    function taoQRMinhHoa() {
+        qrContent.innerHTML = "";
+
+        for (let y = 0; y < 21; y++) {
+            for (let x = 0; x < 21; x++) {
+
+                const cell = document.createElement("div");
+                cell.className = "qr-cell";
+
+                let den = ((x * 7 + y * 11 + x * y) % 3 === 0);
+
+                // Tạo 3 ô vuông định vị giống QR
+                const viTri = [
+                    [0, 0],
+                    [14, 0],
+                    [0, 14]
+                ];
+
+                for (const [sx, sy] of viTri) {
+                    if (x >= sx && x < sx + 7 &&
+                        y >= sy && y < sy + 7) {
+
+                        const dx = x - sx;
+                        const dy = y - sy;
+
+                        den = dx === 0 || dx === 6 ||
+                            dy === 0 || dy === 6 ||
+                            (dx >= 2 && dx <= 4 &&
+                                dy >= 2 && dy <= 4);
+                    }
+                }
+
+                if (den) {
+                    cell.classList.add("black");
+                }
+
+                qrContent.appendChild(cell);
+            }
+        }
+    }
+
+    // Chọn phương thức thanh toán
+    cacPhuongThuc.forEach(function (radio) {
+        radio.addEventListener("change", function () {
+
+            if (this.value === "ChuyenKhoan") {
+                qrContainer.style.display = "block";
+                taoQRMinhHoa();
+            } else {
+                qrContainer.style.display = "none";
+            }
+        });
+    });
+</script>
+<script>
+    const formThanhToan = document.getElementById("formThanhToan");
+    const phuongThucHidden = document.getElementById("phuongThucHidden");
+
+    const cacRadio = document.querySelectorAll(
+        'input[name="phuongThuc"]'
+    );
+
+    cacRadio.forEach(function (radio) {
+        radio.addEventListener("change", function () {
+            phuongThucHidden.value = this.value;
+        });
+    });
+
+    formThanhToan.addEventListener("submit", function (event) {
+        const phuongThuc = phuongThucHidden.value;
+
+        let tenPhuongThuc = phuongThuc === "TienMat"
+            ? "Tiền mặt"
+            : "Chuyển khoản qua mã QR";
+
+        const xacNhan = confirm(
+            "Bạn xác nhận thanh toán bằng " +
+            tenPhuongThuc + "?"
+        );
+
+        if (!xacNhan) {
+            event.preventDefault();
+        }
+    });
+</script>

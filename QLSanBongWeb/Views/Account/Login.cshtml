@@ -1,0 +1,54 @@
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white text-center">
+                <h3>Đăng nhập hệ thống</h3>
+                <p class="mb-0">Quản lý sân bóng mini</p>
+            </div>
+            <div class="card-body">
+                <form asp-action="Login" method="post">
+                    <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+                    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Tên đăng nhập</label>
+                        <input type="text" name="tenDangNhap" value="@ViewBag.TenDangNhap" maxlength="50" autocomplete="username" class="form-control" required />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mật khẩu</label>
+                        <div class="input-group">
+                            <input type="password" name="matKhau" id="txtMatKhau" maxlength="512" autocomplete="current-password" class="form-control" required />
+                            <button class="btn btn-outline-secondary" type="button" id="togglePassword">Hiện</button>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">Đăng nhập</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script nhỏ để xử lý ẩn/hiện mật khẩu -->
+@section Scripts {
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#txtMatKhau');
+
+        togglePassword.addEventListener('click', function (e) {
+            // Toggle type attribute của ô mật khẩu
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+
+            // Thay đổi chữ trên nút
+            this.textContent = type === 'password' ? 'Hiện' : 'Ẩn';
+        });
+    </script>
+}

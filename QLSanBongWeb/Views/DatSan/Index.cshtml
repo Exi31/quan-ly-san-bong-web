@@ -1,0 +1,67 @@
+@model IEnumerable<QuanLySanBong.Models.DatSan>
+@using QuanLySanBong.Models
+@{
+    ViewData["Title"] = "Lịch sân";
+    var sans = (List<San>)ViewBag.SanHienThi;
+    var coHoaDon = (HashSet<string>)ViewBag.LichCoHoaDon;
+    var ngay = DateTime.ParseExact((string)ViewBag.NgayXem, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+    var records = Model.ToList();
+}
+<div class="container-fluid p-0">
+    <h3 class="fw-bold mb-4" style="color:#114b27">Lịch sân</h3>
+    <div class="row g-2 mb-3 bg-white p-3 rounded shadow-sm border align-items-center">
+        <form method="get" asp-action="Index" class="col-md-6 d-flex gap-2">
+            <div class="w-50"><label for="ngayXem" class="fw-bold small">Ngày</label><input id="ngayXem" type="date" name="ngayXem" class="form-control" value="@ViewBag.NgayXem" onchange="this.form.submit()" /></div>
+            <div class="w-50"><label for="maSan" class="fw-bold small">Sân</label><select id="maSan" name="maSan" class="form-control" asp-items="ViewBag.DanhSachSan" onchange="this.form.submit()"><option value="ALL">Tất cả sân</option></select></div>
+        </form>
+        <div class="col-md-6 d-flex flex-wrap justify-content-end gap-2 mt-4">
+            <a asp-action="Create" asp-route-ngayChon="@ViewBag.NgayXem" class="btn btn-success">Đặt sân</a>
+            <form id="formHuyLich" asp-action="HuyLich" method="post" onsubmit="return confirm('Bạn có chắc muốn hủy lịch này?')">
+                <input type="hidden" id="maDatSanHuy" name="id" /><input type="hidden" name="ngayXem" value="@ViewBag.NgayXem" />
+                <button type="submit" id="btnHuyLich" class="btn btn-outline-danger" disabled>Hủy lịch</button>
+            </form>
+            <a asp-action="Index" asp-route-ngayXem="@ViewBag.NgayXem" asp-route-maSan="@ViewBag.MaSanDangChon" class="btn btn-outline-secondary">Làm mới</a>
+        </div>
+    </div>
+    <div class="p-3 border rounded bg-white mb-3"><span class="fw-bold">Thông tin lịch chọn: </span><span id="txtThongTin">Bấm vào một lịch để xem chi tiết.</span></div>
+    <div id="bangLich" class="table-responsive bg-white p-3 rounded shadow-sm border" style="max-height:620px">
+        <table class="table table-bordered text-center align-middle">
+            <thead class="table-success"><tr><th>Giờ</th>@foreach (var san in sans) { <th>@san.TenSan<br /><small>@san.MaSan @(san.TrangThaiHoatDong ? "" : "· Tạm ngừng")</small></th> }</tr></thead>
+            <tbody>
+            @for (int slot = 14; slot < 44; slot++)
+            {
+                var start = ngay.AddMinutes(slot * 30); var end = start.AddMinutes(30);
+                <tr data-slot="@slot"><td class="text-nowrap">@start.ToString("HH:mm") – @(slot == 47 ? "24:00" : end.ToString("HH:mm"))</td>
+                @foreach (var san in sans)
+                {
+                    var bookings = records.Where(d => d.MaSan == san.MaSan && d.GioBatDau < end && d.GioKetThuc > start).ToList();
+                    <td class="schedule-cell @(bookings.Any() ? (bookings.All(d => d.TrangThaiDat == "Hoàn thành") ? "schedule-complete" : "schedule-booked") : "")">
+                    @if (bookings.Count == 0) { <span class="text-muted">@(san.TrangThaiHoatDong ? "Trống" : "Tạm ngừng")</span> }
+                    @foreach (var booking in bookings)
+                    {
+                        bool huyDuoc = booking.TrangThaiDat == "Đã đặt" && !coHoaDon.Contains(booking.MaDatSan);
+                        string details = $"{booking.MaDatSan} | {san.TenSan} | {booking.KhachHang?.TenKH} | {booking.GioBatDau:dd/MM HH:mm} – {booking.GioKetThuc:dd/MM HH:mm} | {booking.TrangThaiDat}" + (coHoaDon.Contains(booking.MaDatSan) ? " | Đã có hóa đơn" : "");
+                        <button type="button" class="chon-lich" data-id="@booking.MaDatSan" data-details="@details" data-cancel="@(huyDuoc ? "1" : "0")">@booking.KhachHang?.TenKH<br /><small>@booking.TrangThaiDat</small></button>
+                    }
+                    </td>
+                }
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+    <p class="small text-muted mt-3">Vàng: đã đặt · Xanh: hoàn thành. Lịch đã hủy không chiếm sân. Lịch đã có hóa đơn không được hủy.</p>
+</div>
+@section Scripts {
+<script>
+document.querySelectorAll('.chon-lich').forEach(button => button.addEventListener('click', () => {
+    document.getElementById('txtThongTin').textContent = button.dataset.details;
+    document.getElementById('maDatSanHuy').value = button.dataset.id;
+    document.getElementById('btnHuyLich').disabled = button.dataset.cancel !== '1';
+}));
+const schedule = document.getElementById('bangLich');
+const firstBooking = schedule.querySelector('.chon-lich');
+const initialRow = firstBooking ? firstBooking.closest('tr') : schedule.querySelector('tr[data-slot="34"]');
+if (initialRow) schedule.scrollTop = Math.max(0, initialRow.offsetTop - 60);
+</script>
+}

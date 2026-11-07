@@ -1,0 +1,376 @@
+{
+  "database": "QLSanBongWeb_Test_20261101_8ad5ee91",
+  "tested_at": "2026-11-01T18:56:23.676129",
+  "checks": [
+    {
+      "name": "Anonymous blocked: /",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Anonymous blocked: /San",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Anonymous blocked: /DatSan",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Anonymous blocked: /KhachHang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Anonymous blocked: /HoaDon",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Anonymous blocked: /ThongKe",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Login POST requires antiforgery",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Incorrect password rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "PBKDF2 manager login",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Render /",
+      "passed": true,
+      "detail": "200 <!DOCTYPE html>\r\n<html lang=\"vi\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" c"
+    },
+    {
+      "name": "Render /San",
+      "passed": true,
+      "detail": "200 <!DOCTYPE html>\r\n<html lang=\"vi\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" c"
+    },
+    {
+      "name": "Render /San/Create",
+      "passed": true,
+      "detail": "200 <!DOCTYPE html>\r\n<html lang=\"vi\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" c"
+    },
+    {
+      "name": "Render /San/Edit/S001",
+      "passed": true,
+      "detail": "200 <!DOCTYPE html>\r\n<html lang=\"vi\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" c"
+    },
+    {
+      "name": "Render /KhachHang",
+      "passed": true,
+      "detail": "200 <!DOCTYPE html>\r\n<html lang=\"vi\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" c"
+    },
+    {
+      "name": "JavaScript syntax /KhachHang",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Render /DatSan",
+      "passed": true,
+      "detail": "200 <!DOCTYPE html>\r\n<html lang=\"vi\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" c"
+    },
+    {
+      "name": "JavaScript syntax /DatSan",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Render /DatSan/Create",
+      "passed": true,
+      "detail": "200 <!DOCTYPE html>\r\n<html lang=\"vi\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" c"
+    },
+    {
+      "name": "JavaScript syntax /DatSan/Create",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Booking script has repaired date assignment",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Render /HoaDon",
+      "passed": true,
+      "detail": "200 <!DOCTYPE html>\r\n<html lang=\"vi\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" c"
+    },
+    {
+      "name": "JavaScript syntax /HoaDon",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Render /ThongKe",
+      "passed": true,
+      "detail": "200 <!DOCTYPE html>\r\n<html lang=\"vi\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" c"
+    },
+    {
+      "name": "Render /ThanhToan?maHD=HD004",
+      "passed": true,
+      "detail": "200 <!DOCTYPE html>\r\n<html lang=\"vi\">\r\n<head>\r\n    <meta charset=\"utf-8\" />\r\n    <meta name=\"viewport\" c"
+    },
+    {
+      "name": "JavaScript syntax /ThanhToan?maHD=HD004",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Sample revenue is 970000",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Revenue rejects reversed dates",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Mutation requires antiforgery",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Zero pitch price rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Create pitch",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Duplicate pitch handled",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Edit pitch",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Invalid customer rejected and values retained",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Create customer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Edit customer",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Customer names encoded in data attributes",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Inactive pitch rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Reversed booking time rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Past booking rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Missing pitch rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "90-minute booking saved",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Overlapping booking rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Adjacent booking allowed",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Dynamic pitch and partial-hour cells render",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Cancel eligible booking",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Invoice rejects cancelled booking",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "90-minute invoice preview = 300000",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Create invoice",
+      "passed": true,
+      "detail": "{\"success\":true,\"message\":\"L\\u1EADp h\\u00F3a \\u0111\\u01A1n th\\u00E0nh c\\u00F4ng!\",\"maHD\":\"HDb0597a74ccf24b839a2b2f33fc190632\",\"maDatSan\":\"DS43d25a5167904313b5d9436947a6bde2\",\"tongTien\":300000,\"trangTh"
+    },
+    {
+      "name": "Duplicate invoice rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Cannot cancel invoiced booking",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Invoice and booking retain historical price",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Invalid payment method rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Confirm payment",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Repeat payment preserves timestamp",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Paid invoice contributes revenue",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Staff login",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Staff forbidden /San/Create",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Staff forbidden /San/Edit/S001",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Staff forbidden /ThongKe",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Staff cannot POST pitch",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Staff can view bookings",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Staff can access billing",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Locked account rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Second manager session",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Concurrent duplicate booking: exactly one saved",
+      "passed": true,
+      "detail": "[302, 200] count=1"
+    },
+    {
+      "name": "Concurrent invoice: exactly one saved",
+      "passed": true,
+      "detail": "[200, 200]"
+    },
+    {
+      "name": "Concurrent payment completes without duplicate update",
+      "passed": true,
+      "detail": "[302, 302]"
+    },
+    {
+      "name": "Create cancellation/invoice race fixture",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Cancel versus invoice race stays consistent",
+      "passed": true,
+      "detail": "Đã hủy|0 [302, 200]"
+    },
+    {
+      "name": "Overnight booking accepted by server",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Overlap across midnight rejected",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Overnight booking visible on following day",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Logout",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "Logged-out session blocked",
+      "passed": true,
+      "detail": ""
+    }
+  ]
+}

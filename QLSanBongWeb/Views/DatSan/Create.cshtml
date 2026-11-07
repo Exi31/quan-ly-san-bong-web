@@ -1,0 +1,116 @@
+@model QuanLySanBong.Models.DatSan
+
+@{
+    ViewData["Title"] = "Đặt sân";
+}
+
+<div class="container-fluid p-0">
+    <h3 class="fw-bold mb-4" style="color: #114b27;"><i class="fa-solid fa-calendar-plus"></i> Đặt sân</h3>
+
+    <form asp-action="Create" method="post" id="formDatSan">
+        <input type="hidden" asp-for="GioBatDau" /><input type="hidden" asp-for="GioKetThuc" />
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div class="border p-3 rounded mb-3 bg-white shadow-sm">
+            <h6 class="fw-bold text-secondary mb-2">Thông tin khách hàng</h6>
+            <div class="row align-items-center">
+                <div class="col-md-10">
+                    <label class="form-label fw-bold small">Khách hàng</label>
+                    <select asp-for="MaKH" class="form-control" asp-items="ViewBag.MaKH" required><option value="">-- Chọn khách hàng --</option></select>
+                </div>
+                <div class="col-md-2 mt-4">
+                    <a href="/KhachHang" class="btn btn-outline-success w-100 fw-bold text-decoration-none text-center">Thêm khách</a>
+                </div>
+            </div>
+        </div>
+        <div class="border p-3 rounded mb-3 bg-white shadow-sm">
+            <h6 class="fw-bold text-secondary mb-2">Thông tin đặt sân</h6>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Sân</label>
+                    <select asp-for="MaSan" class="form-control" asp-items="ViewBag.MaSan" required><option value="">-- Chọn sân --</option></select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Giờ kết thúc</label>
+                    <select class="form-control" id="selectGioKetThuc" onchange="tinhTien()">
+                        @for (int m = 30; m <= 1440; m += 30) {
+                            var time = m == 1440 ? "24:00" : DateTime.Today.AddMinutes(m).ToString("HH:mm");
+                            bool chosen = Model.GioKetThuc.Date > Model.GioBatDau.Date ? m == 1440 : time == Model.GioKetThuc.ToString("HH:mm");
+                            <option value="@time" selected="@chosen">@time</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Ngày đặt</label>
+                    <input type="date" id="inputNgayDat" class="form-control"
+                           value="@Model.GioBatDau.ToString("yyyy-MM-dd")" required />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Đơn giá/giờ</label>
+                    <input type="text" id="inputDonGia" class="form-control bg-white" value="—" readonly data-giatri="0" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Giờ bắt đầu</label>
+                    <select class="form-control" id="selectGioBatDau" onchange="tinhTien()">
+                        @for (int m = 0; m < 1440; m += 30) {
+                            var time = DateTime.Today.AddMinutes(m).ToString("HH:mm");
+                            <option value="@time" selected="@(time == Model.GioBatDau.ToString("HH:mm"))">@time</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-bold small">Tiền dự kiến</label>
+                    <input type="text" id="inputTienDuKien" class="form-control bg-white fw-bold text-success" value="—" readonly />
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn text-white px-4 fw-bold" style="background-color: #114b27;">
+                <i class="fa-solid fa-floppy-disk"></i> Lưu đặt sân
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary px-4 fw-bold">Hủy</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+<script>
+const money = new Intl.NumberFormat('vi-VN');
+function minutes(value) { const [h,m] = value.split(':').map(Number); return h*60+m; }
+function tinhTien() {
+    const duration = minutes(document.getElementById('selectGioKetThuc').value) - minutes(document.getElementById('selectGioBatDau').value);
+    const price = Number(document.getElementById('inputDonGia').dataset.giatri);
+    document.getElementById('inputTienDuKien').value = duration > 0 && price > 0 ? money.format(Math.round(duration/60*price)) + ' đ' : 'Chọn sân và giờ hợp lệ';
+}
+let priceRequest = 0;
+async function capNhatGia() {
+    const request = ++priceRequest;
+    const id = document.getElementById('MaSan').value;
+    const field = document.getElementById('inputDonGia');
+    field.dataset.giatri='0'; field.value='—'; tinhTien();
+    if (!id) return;
+    try {
+        const response = await fetch('@Url.Action("GiaSan", "DatSan")' + '?maSan=' + encodeURIComponent(id));
+        if (!response.ok) throw new Error();
+        const data = await response.json();
+        if (request !== priceRequest) return;
+        field.dataset.giatri=data.donGia; field.value=money.format(data.donGia)+' đ'; tinhTien();
+    } catch { if (request === priceRequest) field.value='Không lấy được giá sân'; }
+}
+document.getElementById('MaSan').addEventListener('change', capNhatGia);
+capNhatGia();
+document.getElementById('formDatSan').addEventListener('submit', function(event) {
+    const day = document.getElementById('inputNgayDat').value;
+    const start = document.getElementById('selectGioBatDau').value;
+    const end = document.getElementById('selectGioKetThuc').value;
+    if (!day || minutes(end) <= minutes(start)) { event.preventDefault(); alert('Giờ kết thúc phải sau giờ bắt đầu.'); return; }
+    document.getElementById('GioBatDau').value=day+'T'+start+':00';
+    if (end === '24:00') {
+        const [y,m,d]=day.split('-').map(Number); const next=new Date(y,m-1,d+1);
+        const nextDay=[next.getFullYear(),String(next.getMonth()+1).padStart(2,'0'),String(next.getDate()).padStart(2,'0')].join('-');
+        document.getElementById('GioKetThuc').value=nextDay+'T00:00:00';
+    } else document.getElementById('GioKetThuc').value=day+'T'+end+':00';
+});
+</script>
+}
